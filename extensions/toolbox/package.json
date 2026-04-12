@@ -1,0 +1,51 @@
+{
+    "package_version": 2,
+    "version": "1.0.0",
+    "name": "toolbox",
+    "description": "A dockable editor toolbox for the Scratcher-Clicker project. Provides a Window Manager to scaffold, edit, and delete UI window scripts, keeping WindowNames.ts and the window registry in sync automatically.",
+    "author": "Yuankun Huang",
+    "main": "./main.js",
+    "panels": {
+        "default": {
+            "title": "Toolbox",
+            "type": "dockable",
+            "main": "./panels/default.js",
+            "size": {
+                "min-width": 520,
+                "min-height": 400,
+                "width": 800,
+                "height": 560
+            }
+        }
+    },
+    "contributions": {
+        "menu": [
+            {
+                "path": "i18n:menu.panel/toolbox",
+                "label": "Tools Panel",
+                "message": "open-panel"
+            }
+        ],
+        "messages": {
+            "open-panel": {
+                "methods": ["openPanel"]
+            },
+            "scan-windows": {
+                "methods": ["scanWindows"]
+            },
+            "create-window": {
+                "methods": ["createWindow"]
+            },
+            "delete-windows": {
+                "methods": ["deleteWindows"]
+            },
+            "edit-window": {
+                "methods": ["editWindow"]
+            },
+            "read-window-attrs": {
+                "methods": ["readWindowAttrs"]
+            }
+        }
+    },
+    "editor": ">=3.8.0"
+}

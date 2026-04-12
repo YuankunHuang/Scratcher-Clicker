@@ -146,6 +146,15 @@ GameManager.onLoad()
 
 ---
 
+## Editor Toolbox (extension)
+
+The project includes a dockable editor panel at [`extensions/toolbox`](extensions/toolbox):
+
+- **Panels → Tools Panel** — left sidebar lists tools; **Window Manager** creates / edits / deletes window scripts and updates `WindowNames.ts` + `ui/windows/index.ts`.
+- Enable it in **Extension Manager** (refresh extensions if the panel does not appear).
+
+---
+
 ## Prerequisites
 
 - **Cocos Creator 3.8.8**

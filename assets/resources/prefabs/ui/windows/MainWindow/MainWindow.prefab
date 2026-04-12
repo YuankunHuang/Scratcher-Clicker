@@ -130,8 +130,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 809.0093630725191,
-      "height": 75.60000000000001
+      "width": 674.2431640625,
+      "height": 75.6
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -169,8 +169,8 @@
     "_string": "Welcome to Scratcher-Clicker!",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 61.40625,
-    "_fontSize": 60,
+    "_actualFontSize": 50,
+    "_fontSize": 50,
     "_fontFamily": "Arial",
     "_lineHeight": 60,
     "_overflow": 0,
@@ -385,7 +385,7 @@
     "_string": "RESTART",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 40.9375,
+    "_actualFontSize": 40,
     "_fontSize": 40,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
