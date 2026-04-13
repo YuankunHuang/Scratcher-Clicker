@@ -4,11 +4,9 @@ const { ccclass, property } = _decorator;
 
 @ccclass('MainWindowConfig')
 export class MainWindowConfig extends WindowConfig {
-    @property(Label)
-    coinLabel: Label = null!;
-    
-    @property(Button)
-    restartBtn: Button = null!;
+    @property(Label) coinLabel: Label = null!;
+    @property(Button) restartBtn: Button = null!;
+    @property(Button) demoBtn: Button = null!;
 }
 
 

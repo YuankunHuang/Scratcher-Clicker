@@ -1,5 +1,1 @@
-export class LoadingWindowData {
-    
-}
-
-
+export interface LoadingWindowData {}

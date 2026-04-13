@@ -11,3 +11,5 @@ import './LoginWindow/LoginWindowController';
 
 
 
+import './DemoWindow/DemoWindowController';
+import './ConfirmWindow/ConfirmWindowController';

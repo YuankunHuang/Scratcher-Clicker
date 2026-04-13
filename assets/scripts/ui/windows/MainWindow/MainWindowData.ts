@@ -1,5 +1,1 @@
-export class MainWindowData {
-    
-}
-
-
+export interface MainWindowData {}

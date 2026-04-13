@@ -65,7 +65,7 @@ export class ${name}Config extends WindowConfig {}
 }
 
 function buildDataTs(name) {
-    return `export class ${name}Data {}
+    return `export interface ${name}Data {}
 `;
 }
 
@@ -78,6 +78,7 @@ function formatDecoratorAttrs(attrs, windowName) {
     stackable: ${attrs.stackable},
     showMask: ${attrs.showMask},
     maskClickClose: ${attrs.maskClickClose},
+    isTransparent: ${attrs.isTransparent},
     blurBackground: ${attrs.blurBackground},
     destroyOnCovered: ${attrs.destroyOnCovered},
 }`;
@@ -174,6 +175,7 @@ function createWindowFiles(attrs) {
         stackable: !!attrs.stackable,
         showMask: !!attrs.showMask,
         maskClickClose: !!attrs.maskClickClose,
+        isTransparent: !!attrs.isTransparent,
         blurBackground: !!attrs.blurBackground,
         destroyOnCovered: !!attrs.destroyOnCovered,
     };
@@ -244,6 +246,7 @@ function parseAttrsFromController(content) {
         stackable: boolOr('stackable', true),
         showMask: boolOr('showMask', true),
         maskClickClose: boolOr('maskClickClose', true),
+        isTransparent: boolOr('isTransparent', false),
         blurBackground: boolOr('blurBackground', false),
         destroyOnCovered: boolOr('destroyOnCovered', false),
     };
@@ -279,6 +282,7 @@ function editWindow(payload) {
         stackable: !!payload.stackable,
         showMask: !!payload.showMask,
         maskClickClose: !!payload.maskClickClose,
+        isTransparent: !!payload.isTransparent,
         blurBackground: !!payload.blurBackground,
         destroyOnCovered: !!payload.destroyOnCovered,
     };

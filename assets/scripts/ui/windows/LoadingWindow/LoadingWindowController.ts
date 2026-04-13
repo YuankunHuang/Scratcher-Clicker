@@ -9,7 +9,7 @@ import {Services} from "../../../Services";
 
 @windowController(WindowNames.LoadingWindow, {
     prefabPath: 'prefabs/ui/windows/LoadingWindow/LoadingWindow',
-    showMask: false,
+    maskClickClose: false,
     destroyOnCovered: true
 })
 export class LoadingWindowController extends WindowControllerBase<LoadingWindowConfig, LoadingWindowData> {

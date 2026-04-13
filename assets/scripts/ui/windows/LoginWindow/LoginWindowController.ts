@@ -9,7 +9,7 @@ import {Services} from "../../../../scripts/Services";
 
 @windowController(WindowNames.LoginWindow, {
     prefabPath: 'prefabs/ui/windows/LoginWindow/LoginWindow',
-    showMask : false,
+    maskClickClose: false,
     destroyOnCovered: true,
 })
 export class LoginWindowController extends WindowControllerBase<LoginWindowConfig, LoginWindowData> {

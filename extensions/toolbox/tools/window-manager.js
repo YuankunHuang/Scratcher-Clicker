@@ -14,6 +14,7 @@ const I18N = {
         stackable:        'stackable',
         showMask:         'showMask',
         maskClickClose:   'maskClickClose',
+        isTransparent:    'isTransparent',
         blurBackground:   'blurBackground',
         destroyOnCovered: 'destroyOnCovered',
         btnCreate:        'Create window',
@@ -48,6 +49,7 @@ const I18N = {
         stackable:        '可入栈',
         showMask:         '显示遮罩',
         maskClickClose:   '点遮罩关闭',
+        isTransparent:    '透明（保留下方窗可见）',
         blurBackground:   '模糊背景',
         destroyOnCovered: '覆盖后销毁',
         btnCreate:        '创建窗口',
@@ -119,6 +121,7 @@ function renderHTML(lang = 'en') {
       <label><input type="checkbox" id="wm-new-stackable" checked /> ${t.stackable}</label>
       <label><input type="checkbox" id="wm-new-showmask" checked /> ${t.showMask}</label>
       <label><input type="checkbox" id="wm-new-maskclick" checked /> ${t.maskClickClose}</label>
+      <label><input type="checkbox" id="wm-new-transparent" /> ${t.isTransparent}</label>
       <label><input type="checkbox" id="wm-new-blur" /> ${t.blurBackground}</label>
       <label><input type="checkbox" id="wm-new-destroy" /> ${t.destroyOnCovered}</label>
     </div>
@@ -140,6 +143,7 @@ function renderHTML(lang = 'en') {
       <label><input type="checkbox" id="wm-edit-stackable" /> ${t.stackable}</label>
       <label><input type="checkbox" id="wm-edit-showmask" /> ${t.showMask}</label>
       <label><input type="checkbox" id="wm-edit-maskclick" /> ${t.maskClickClose}</label>
+      <label><input type="checkbox" id="wm-edit-transparent" /> ${t.isTransparent}</label>
       <label><input type="checkbox" id="wm-edit-blur" /> ${t.blurBackground}</label>
       <label><input type="checkbox" id="wm-edit-destroy" /> ${t.destroyOnCovered}</label>
     </div>
@@ -204,19 +208,21 @@ function readNewPayload(root) {
         stackable:        root.querySelector('#wm-new-stackable').checked,
         showMask:         root.querySelector('#wm-new-showmask').checked,
         maskClickClose:   root.querySelector('#wm-new-maskclick').checked,
+        isTransparent:    root.querySelector('#wm-new-transparent').checked,
         blurBackground:   root.querySelector('#wm-new-blur').checked,
         destroyOnCovered: root.querySelector('#wm-new-destroy').checked,
     };
 }
 
 function applyAttrsToEdit(root, attrs, windowName) {
-    root.querySelector('#wm-edit-prefab').value           = defaultPrefabPath(windowName);
-    root.querySelector('#wm-edit-layer').value            = attrs.layer || 'Normal';
-    root.querySelector('#wm-edit-stackable').checked      = !!attrs.stackable;
-    root.querySelector('#wm-edit-showmask').checked       = !!attrs.showMask;
-    root.querySelector('#wm-edit-maskclick').checked      = !!attrs.maskClickClose;
-    root.querySelector('#wm-edit-blur').checked           = !!attrs.blurBackground;
-    root.querySelector('#wm-edit-destroy').checked        = !!attrs.destroyOnCovered;
+    root.querySelector('#wm-edit-prefab').value              = defaultPrefabPath(windowName);
+    root.querySelector('#wm-edit-layer').value               = attrs.layer || 'Normal';
+    root.querySelector('#wm-edit-stackable').checked         = !!attrs.stackable;
+    root.querySelector('#wm-edit-showmask').checked          = !!attrs.showMask;
+    root.querySelector('#wm-edit-maskclick').checked         = !!attrs.maskClickClose;
+    root.querySelector('#wm-edit-transparent').checked       = !!attrs.isTransparent;
+    root.querySelector('#wm-edit-blur').checked              = !!attrs.blurBackground;
+    root.querySelector('#wm-edit-destroy').checked           = !!attrs.destroyOnCovered;
 }
 
 function readEditPayload(root) {
@@ -228,6 +234,7 @@ function readEditPayload(root) {
         stackable:        root.querySelector('#wm-edit-stackable').checked,
         showMask:         root.querySelector('#wm-edit-showmask').checked,
         maskClickClose:   root.querySelector('#wm-edit-maskclick').checked,
+        isTransparent:    root.querySelector('#wm-edit-transparent').checked,
         blurBackground:   root.querySelector('#wm-edit-blur').checked,
         destroyOnCovered: root.querySelector('#wm-edit-destroy').checked,
     };

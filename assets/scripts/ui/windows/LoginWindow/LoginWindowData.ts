@@ -1,5 +1,1 @@
-export class LoginWindowData {
-    
-}
-
-
+export interface LoginWindowData {}

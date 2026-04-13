@@ -89,11 +89,12 @@ assets/scripts/
 │   ├── EventManagerImpl.ts
 │   ├── AudioManagerImpl.ts
 │   ├── SaveManagerImpl.ts
-│   └── UIManagerImpl.ts       Window stack, async prefab loading, queue
+│   └── UIManagerImpl.ts       Window stack, async prefab loading, queue, blur capture
 │
 ├── ui/
 │   ├── base/
-│   │   ├── WindowAttributes.ts   WindowLayer enum + WindowAttributes interface
+│   │   ├── WindowAttributes.ts   WindowLayer + WindowAttributes (showMask / maskClickClose /
+│   │   │                         isTransparent / blurBackground / destroyOnCovered …)
 │   │   ├── WindowConfig.ts       Base cc.Component for prefab UI bindings
 │   │   └── WindowControllerBase.ts
 │   ├── registry/
@@ -102,8 +103,13 @@ assets/scripts/
 │   │   ├── index.ts              Import all controllers here to trigger registration
 │   │   ├── LoadingWindow/
 │   │   ├── LoginWindow/
-│   │   └── MainWindow/
+│   │   ├── MainWindow/
+│   │   ├── ConfirmWindow/        Reusable confirm dialog (blurBackground + isTransparent)
+│   │   └── DemoWindow/           Core scratch-effect playground
 │   └── WindowNames.ts            Type-safe window key constants
+│
+├── gameplay/
+│   └── ScratchRenderer.ts     CPU-side pixel-manipulation scratch engine (Texture2D + Uint8Array)
 │
 ├── data/
 │   └── GameData.ts               Pure TS runtime data model + serialization
@@ -111,6 +117,33 @@ assets/scripts/
 ├── AppFlow.ts                    Application entry point (static, stateless)
 └── Services.ts                   Thin façade: Services.ui / .audio / .save / .event
 ```
+
+---
+
+## Window Attributes
+
+Each window declares its behaviour via the `@windowController` decorator:
+
+```typescript
+@windowController(WindowNames.ConfirmWindow, {
+    prefabPath:      'prefabs/ui/windows/ConfirmWindow/ConfirmWindow',
+    layer:           WindowLayer.Dialog,
+    stackable:       true,   // push onto the UI stack
+    showMask:        true,   // generate a full-screen helper below the window
+    maskClickClose:  false,  // tap mask to call goBack()
+    isTransparent:   true,   // do NOT hide the window underneath; mask is invisible
+    blurBackground:  true,   // capture current frame → downscale → frosted-glass bg
+    destroyOnCovered: false, // keep alive when another window is pushed on top
+})
+```
+
+| Attribute | Effect |
+|---|---|
+| `showMask` | Full-screen background (solid colour or blur image) + touch blocker injected below the window content |
+| `isTransparent` | Window below stays visible and interactive; background is fully transparent |
+| `blurBackground` | Captures the current frame before showing the window, displayed as a frosted-glass background. Requires `isTransparent: true` |
+| `maskClickClose` | Tapping outside the window calls `goBack()` |
+| `destroyOnCovered` | Window is destroyed (not merely hidden) when another stackable window opens on top |
 
 ---
 
