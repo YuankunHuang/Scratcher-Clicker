@@ -1,0 +1,3 @@
+[submodule "tools/GameDataConfigTool"]
+	path = tools/GameDataConfigTool
+	url = https://github.com/YuankunHuang/GameDataConfigTool.git
