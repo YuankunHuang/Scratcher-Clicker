@@ -31,10 +31,11 @@ export class ServiceLocator {
 
 export const Tokens = {
     Audio: Symbol(`IAudioManager`),
-    UI: Symbol(`IUIManager`),
-    Save: Symbol(`ISaveManager`),
-    Idle: Symbol(`IIdleSystem`),
+    UI:    Symbol(`IUIManager`),
+    Save:  Symbol(`ISaveManager`),
+    Idle:  Symbol(`IIdleSystem`),
     Event: Symbol(`IEventManager`),
+    Asset: Symbol(`IAssetManager`),
 } as const;
 
 

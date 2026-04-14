@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>寻宝人 · Phase 2 UI Mockup</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #1a1a1a;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 24px;
+    font-family: 'Noto Serif SC', 'Source Han Serif CN', 'STSong', Georgia, serif;
+  }
+
+  /* ── 导航 ─────────────────────────────────── */
+  .nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: #111;
+    display: flex;
+    gap: 4px;
+    padding: 8px 12px;
+    z-index: 100;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .nav-btn {
+    background: #333;
+    color: #aaa;
+    border: 1px solid #444;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+    transition: all .2s;
+  }
+  .nav-btn.active { background: #C9A84C; color: #1a0a00; border-color: #C9A84C; font-weight: 700; }
+
+  /* ── 手机框 ────────────────────────────────── */
+  .phone-wrap {
+    margin-top: 52px;
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+  }
+  .phone {
+    width: 360px;
+    height: 780px;
+    background: #F2E8D9;
+    border-radius: 32px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 0 10px #222, 0 0 0 12px #444, 0 20px 60px rgba(0,0,0,.7);
+    flex-shrink: 0;
+  }
+
+  /* ── 通用 ──────────────────────────────────── */
+  .screen { display: none; width: 100%; height: 100%; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  :root {
+    --bg:       #F2E8D9;
+    --paper:    #FFF8EE;
+    --gold:     #C9A84C;
+    --brown:    #6B3A2A;
+    --dark:     #2C1810;
+    --muted:    #8B7355;
+    --green:    #4A7C4E;
+    --purple:   #7B3FA0;
+    --red:      #C0392B;
+    --border:   #D4B896;
+    --shadow:   rgba(44,24,16,.15);
+  }
+
+  /* ── 顶部状态栏 ────────────────────────────── */
+  .status-bar {
+    height: 28px;
+    background: var(--brown);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    color: #F2E8D9;
+    font-size: 11px;
+    letter-spacing: .5px;
+  }
+
+  /* ── 资源栏 ────────────────────────────────── */
+  .resource-bar {
+    background: var(--brown);
+    padding: 8px 14px 10px;
+    display: flex;
+    gap: 12px;
+  }
+  .resource-chip {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(0,0,0,.25);
+    border-radius: 20px;
+    padding: 4px 12px 4px 6px;
+    color: #FFF8EE;
+    font-size: 13px;
+  }
+  .resource-icon {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+  .coin-icon  { background: var(--gold); }
+  .rep-icon   { background: #5B8AAA; }
+
+  /* ── ①主界面: 刮擦区 ──────────────────────── */
+  .scratch-area {
+    flex: 1;
+    background: #3D2B1F;
+    position: relative;
+    overflow: hidden;
+    cursor: crosshair;
+  }
+  .artifact-img {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .artifact-base {
+    width: 240px; height: 240px;
+    background: radial-gradient(ellipse at 40% 35%, #b8860b 0%, #8B6914 35%, #5C4A1E 70%, #3D3010 100%);
+    border-radius: 50% 50% 45% 45%;
+    position: relative;
+    box-shadow: inset 0 -20px 40px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.5);
+  }
+  .artifact-base::after {
+    content: '';
+    position: absolute; inset: 15px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 35% 30%, rgba(200,160,60,.3) 0%, transparent 60%);
+  }
+  .dirt-overlay {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 55% 60%, rgba(80,55,30,.9) 0%, transparent 50%),
+      radial-gradient(ellipse at 20% 30%, rgba(100,70,40,.85) 0%, transparent 45%),
+      radial-gradient(ellipse at 80% 20%, rgba(60,40,20,.8) 0%, transparent 40%),
+      radial-gradient(ellipse at 40% 80%, rgba(90,60,30,.75) 0%, transparent 45%);
+    border-radius: 50% 50% 45% 45%;
+    mix-blend-mode: multiply;
+  }
+  .scratch-hint {
+    position: absolute; bottom: 24px; left: 0; right: 0;
+    text-align: center; color: rgba(255,255,255,.5);
+    font-size: 12px; letter-spacing: 2px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:.9} }
+
+  .progress-wrap {
+    background: #2A1F14;
+    padding: 10px 16px;
+  }
+  .progress-label {
+    display: flex; justify-content: space-between;
+    color: var(--muted); font-size: 11px; margin-bottom: 5px;
+  }
+  .progress-bar-bg {
+    height: 8px; background: rgba(255,255,255,.1); border-radius: 4px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), #E8C56A);
+    border-radius: 4px;
+    width: 62%;
+    transition: width .3s;
+  }
+
+  /* 工具栏 */
+  .tool-bar {
+    background: #2A1F14;
+    padding: 8px 16px 10px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    border-top: 1px solid rgba(255,255,255,.06);
+  }
+  .tool-btn {
+    width: 52px; height: 52px;
+    background: rgba(255,255,255,.06);
+    border: 2px solid rgba(255,255,255,.1);
+    border-radius: 12px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .2s; gap: 3px;
+  }
+  .tool-btn.active {
+    background: rgba(201,168,76,.15);
+    border-color: var(--gold);
+  }
+  .tool-emoji { font-size: 22px; line-height: 1; }
+  .tool-name { font-size: 9px; color: var(--muted); }
+  .tool-btn.active .tool-name { color: var(--gold); }
+
+  /* 底部导航 */
+  .bottom-nav {
+    background: var(--brown);
+    display: flex;
+    border-top: 1px solid rgba(255,255,255,.1);
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 8px 0 10px;
+    cursor: pointer; color: rgba(255,255,255,.5);
+    font-size: 10px; gap: 3px; transition: color .2s;
+  }
+  .nav-item.active { color: var(--gold); }
+  .nav-item .ni-icon { font-size: 20px; }
+
+  /* ── ②鉴定弹窗 ─────────────────────────────── */
+  .appraisal-screen {
+    background: rgba(44,24,16,.6);
+    backdrop-filter: blur(6px);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .appraisal-card {
+    background: var(--paper);
+    border-radius: 16px;
+    width: 100%;
+    overflow: hidden;
+    box-shadow: 0 24px 60px rgba(0,0,0,.5);
+    border: 1px solid var(--border);
+  }
+  .card-header {
+    background: var(--brown);
+    padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-title { color: var(--gold); font-size: 13px; letter-spacing: 2px; }
+  .rarity-badge {
+    padding: 2px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 700;
+  }
+  .rarity-rare   { background: rgba(201,168,76,.2); color: var(--gold); border: 1px solid var(--gold); }
+  .rarity-epic   { background: rgba(123,63,160,.2); color: #C38EE8;    border: 1px solid #7B3FA0; }
+  .rarity-normal { background: rgba(74,124,78,.2);  color: #7EC883;    border: 1px solid #4A7C4E; }
+
+  .card-reveal {
+    height: 160px;
+    background: linear-gradient(135deg, #2C1810 0%, #4A3020 50%, #6B4530 100%);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .reveal-artifact {
+    width: 120px; height: 120px;
+    background: radial-gradient(ellipse at 40% 35%, #D4A017 0%, #B8860B 30%, #8B6914 60%, #5C4A1E 100%);
+    border-radius: 50% 50% 40% 40%;
+    box-shadow: 0 0 30px rgba(201,168,76,.4), inset 0 -10px 20px rgba(0,0,0,.3);
+  }
+  .reveal-glow {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 50%, rgba(201,168,76,.15) 0%, transparent 70%);
+  }
+  .reveal-particles {
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(201,168,76,.6) 1px, transparent 1px),
+      radial-gradient(circle at 70% 20%, rgba(201,168,76,.4) 1px, transparent 1px),
+      radial-gradient(circle at 85% 70%, rgba(201,168,76,.5) 1px, transparent 1px),
+      radial-gradient(circle at 15% 80%, rgba(201,168,76,.3) 1px, transparent 1px);
+    background-size: 100% 100%;
+    animation: sparkle 3s ease-in-out infinite;
+  }
+  @keyframes sparkle { 0%,100%{opacity:.4} 50%{opacity:1} }
+
+  .card-info { padding: 14px 16px; }
+  .artifact-name { font-size: 18px; color: var(--dark); font-weight: 700; margin-bottom: 2px; }
+  .artifact-dynasty { font-size: 11px; color: var(--muted); margin-bottom: 12px; letter-spacing: 1px; }
+
+  .info-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 7px 0; border-bottom: 1px dashed var(--border);
+  }
+  .info-row:last-of-type { border-bottom: none; }
+  .info-label { font-size: 11px; color: var(--muted); }
+  .info-value { font-size: 13px; color: var(--dark); font-weight: 600; }
+  .info-value.gold-text { color: #B8860B; }
+  .info-value.condition-good { color: var(--green); }
+  .info-value.condition-ok   { color: #E8A040; }
+
+  .history-note {
+    margin-top: 10px;
+    background: rgba(201,168,76,.08);
+    border-left: 3px solid var(--gold);
+    padding: 8px 10px;
+    font-size: 11px; color: var(--muted);
+    line-height: 1.6; border-radius: 0 6px 6px 0;
+  }
+
+  .card-actions { display: flex; gap: 10px; padding: 14px 16px 16px; }
+  .btn-sell {
+    flex: 1; padding: 13px;
+    background: linear-gradient(135deg, #B8860B, #C9A84C);
+    color: #FFF8EE; border: none; border-radius: 10px;
+    font-size: 14px; font-family: inherit; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    box-shadow: 0 4px 12px rgba(184,134,11,.3);
+  }
+  .btn-donate {
+    flex: 1; padding: 13px;
+    background: linear-gradient(135deg, #3A6B8A, #5B8AAA);
+    color: #FFF8EE; border: none; border-radius: 10px;
+    font-size: 14px; font-family: inherit; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    box-shadow: 0 4px 12px rgba(58,107,138,.3);
+  }
+  .btn-sub { font-size: 10px; opacity: .75; }
+  .btn-sell:disabled { background: #888; box-shadow: none; cursor: not-allowed; }
+
+  /* ── ③工具升级 ──────────────────────────────── */
+  .upgrade-overlay {
+    background: rgba(44,24,16,.7);
+    backdrop-filter: blur(8px);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-end;
+    padding-bottom: 0;
+  }
+  .upgrade-sheet {
+    background: var(--paper);
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    padding: 20px 16px 24px;
+    box-shadow: 0 -12px 40px rgba(0,0,0,.3);
+  }
+  .sheet-handle {
+    width: 36px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 16px;
+  }
+  .sheet-title {
+    font-size: 15px; color: var(--dark); font-weight: 700;
+    text-align: center; margin-bottom: 4px;
+  }
+  .sheet-subtitle { font-size: 11px; color: var(--muted); text-align: center; margin-bottom: 16px; }
+
+  .tool-cards { display: flex; gap: 10px; margin-bottom: 16px; }
+  .tool-card {
+    flex: 1; background: var(--bg);
+    border: 2px solid var(--border);
+    border-radius: 12px; padding: 12px 8px;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    position: relative; cursor: pointer; transition: all .2s;
+  }
+  .tool-card.current {
+    border-color: var(--gold);
+    background: rgba(201,168,76,.08);
+  }
+  .tool-card.locked { opacity: .5; cursor: not-allowed; }
+  .current-badge {
+    position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+    background: var(--gold); color: #1a0a00;
+    font-size: 9px; font-weight: 700; padding: 2px 8px;
+    border-radius: 10px; white-space: nowrap;
+  }
+  .tc-icon { font-size: 28px; }
+  .tc-name { font-size: 11px; color: var(--dark); font-weight: 600; }
+  .tc-effect { font-size: 9px; color: var(--muted); text-align: center; line-height: 1.4; }
+  .tc-price {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 11px; color: var(--gold); font-weight: 700;
+  }
+
+  .upgrade-desc {
+    background: rgba(107,58,42,.06);
+    border-radius: 10px; padding: 10px 12px;
+    font-size: 11px; color: var(--muted); line-height: 1.6;
+    margin-bottom: 14px;
+  }
+  .btn-upgrade {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, #B8860B, #D4A820);
+    color: #1a0a00; border: none; border-radius: 12px;
+    font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer;
+    box-shadow: 0 6px 16px rgba(184,134,11,.35);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+
+  /* ── ④博物馆 ─────────────────────────────────── */
+  .museum-screen {
+    background: var(--bg);
+    display: flex; flex-direction: column;
+  }
+  .museum-header {
+    background: var(--brown);
+    padding: 10px 16px 12px;
+  }
+  .museum-title { color: var(--gold); font-size: 16px; font-weight: 700; letter-spacing: 2px; margin-bottom: 8px; }
+  .collection-progress {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .coll-bar-bg { flex: 1; height: 6px; background: rgba(255,255,255,.15); border-radius: 3px; overflow: hidden; }
+  .coll-bar-fill { height: 100%; background: var(--gold); width: 30%; border-radius: 3px; }
+  .coll-text { color: rgba(255,255,255,.6); font-size: 11px; }
+
+  .museum-body { flex: 1; overflow-y: auto; padding: 12px; }
+  .period-label {
+    font-size: 10px; color: var(--muted); letter-spacing: 2px;
+    margin: 8px 0 6px; padding-left: 2px;
+    border-left: 2px solid var(--gold); padding-left: 6px;
+  }
+  .artifact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px; }
+  .artifact-cell {
+    aspect-ratio: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .artifact-cell.revealed {
+    background: linear-gradient(135deg, #2C1810, #4A3020);
+  }
+  .artifact-cell.locked {
+    background: #2C1810;
+  }
+  .ac-inner {
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 4px;
+  }
+  .ac-art {
+    width: 60%; aspect-ratio: 1;
+    border-radius: 50% 50% 40% 40%;
+  }
+  .ac-art.bronze { background: radial-gradient(ellipse at 40% 35%, #D4A017, #8B6914, #5C4A1E); }
+  .ac-art.ceramic { background: radial-gradient(ellipse at 40% 30%, #E8E0D0, #C8BEB0, #8B8478); border-radius: 45% 45% 35% 35%; }
+  .ac-art.jade { background: radial-gradient(ellipse at 40% 35%, #7EC883, #4A7C4E, #2D4F30); }
+  .ac-art.silhouette { background: #1a0a00; opacity: .6; }
+  .ac-name { font-size: 9px; color: rgba(255,255,255,.8); text-align: center; line-height: 1.2; }
+  .ac-lock { font-size: 20px; opacity: .2; }
+  .ac-rarity-dot {
+    position: absolute; top: 5px; right: 5px;
+    width: 6px; height: 6px; border-radius: 50%;
+  }
+  .dot-rare   { background: var(--gold); }
+  .dot-epic   { background: #C38EE8; }
+  .dot-normal { background: #7EC883; }
+
+  .museum-stats {
+    background: var(--paper);
+    margin: 8px 0 4px;
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex; gap: 0;
+  }
+  .stat-item {
+    flex: 1; text-align: center;
+    padding: 0 8px; border-right: 1px solid var(--border);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-val { font-size: 16px; font-weight: 700; color: var(--dark); }
+  .stat-lbl { font-size: 9px; color: var(--muted); margin-top: 2px; }
+
+  /* ── 注释面板 ──────────────────────────────── */
+  .notes {
+    width: 320px;
+    color: #ccc;
+    font-family: 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  .notes h3 { color: var(--gold); margin-bottom: 8px; font-size: 14px; }
+  .notes h4 { color: #aaa; margin: 14px 0 4px; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+  .notes ul { padding-left: 16px; color: #888; }
+  .notes li { margin-bottom: 4px; }
+  .notes .tag {
+    display: inline-block; padding: 1px 6px; border-radius: 3px;
+    font-size: 10px; margin-right: 4px;
+  }
+  .tag-window { background: #2a3a4a; color: #7aabcf; }
+  .tag-node   { background: #2a3a2a; color: #7acc7a; }
+  .tag-anim   { background: #3a2a3a; color: #cc7acc; }
+  .tag-data   { background: #3a3a2a; color: #cccc7a; }
+  hr.note-sep { border: none; border-top: 1px solid #333; margin: 16px 0; }
+
+  /* ── 竖屏说明 ──────────────────────────────── */
+  @media (max-width: 800px) {
+    .phone-wrap { flex-direction: column; align-items: center; }
+    .notes { width: 360px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="showScreen('main')">① 刮擦主界面</button>
+  <button class="nav-btn" onclick="showScreen('appraisal')">② 鉴定弹窗</button>
+  <button class="nav-btn" onclick="showScreen('upgrade')">③ 工具升级</button>
+  <button class="nav-btn" onclick="showScreen('museum')">④ 博物馆</button>
+</div>
+
+<div class="phone-wrap">
+
+  <!-- ══ 手机 ══════════════════════════════════ -->
+  <div class="phone">
+
+    <!-- ① 刮擦主界面 -->
+    <div class="screen active" id="s-main">
+      <div class="status-bar">
+        <span>9:41</span><span>陈记古玩铺</span><span>🔋</span>
+      </div>
+      <div class="resource-bar">
+        <div class="resource-chip">
+          <div class="resource-icon coin-icon">🪙</div>
+          <span>12,480</span>
+        </div>
+        <div class="resource-chip">
+          <div class="resource-icon rep-icon">⭐</div>
+          <span>声望 340</span>
+        </div>
+      </div>
+
+      <!-- 文物名片 -->
+      <div style="background:#2A1F14;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="color:#F2E8D9;font-size:13px;font-weight:700;">未知青铜器 · 待清洁</div>
+          <div style="color:#8B7355;font-size:10px;margin-top:1px;">外公手记标注：海捞 · 未鉴定</div>
+        </div>
+        <div style="background:rgba(201,168,76,.15);border:1px solid #C9A84C;color:#C9A84C;font-size:10px;padding:3px 10px;border-radius:20px;">稀有?</div>
+      </div>
+
+      <!-- 刮擦区 -->
+      <div class="scratch-area">
+        <div class="artifact-img">
+          <div style="position:relative;">
+            <div class="artifact-base"></div>
+            <div class="dirt-overlay"></div>
+            <!-- 已擦出的区域模拟 -->
+            <div style="position:absolute;top:40px;left:60px;width:80px;height:70px;
+              background:radial-gradient(ellipse,rgba(212,160,23,.6) 0%,transparent 70%);
+              border-radius:50%;pointer-events:none;"></div>
+          </div>
+        </div>
+        <div class="scratch-hint">用手指划动清洁文物</div>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-label">
+          <span>清洁进度</span><span>62% · 达 90% 触发鉴定</span>
+        </div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill"></div></div>
+      </div>
+
+      <div class="tool-bar">
+        <div class="tool-btn active">
+          <div class="tool-emoji">🖌️</div>
+          <div class="tool-name">软毛刷</div>
+        </div>
+        <div class="tool-btn">
+          <div class="tool-emoji">⚙️</div>
+          <div class="tool-name">抛光机</div>
+        </div>
+        <div class="tool-btn">
+          <div class="tool-emoji">💧</div>
+          <div class="tool-name">水枪</div>
+        </div>
+        <div class="tool-btn" onclick="showScreen('upgrade')" style="border-style:dashed;">
+          <div class="tool-emoji">🔧</div>
+          <div class="tool-name">升级</div>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item active" onclick="showScreen('main')">
+          <div class="ni-icon">🏠</div><span>工作台</span>
+        </div>
+        <div class="nav-item" onclick="showScreen('museum')">
+          <div class="ni-icon">🏛️</div><span>博物馆</span>
+        </div>
+        <div class="nav-item">
+          <div class="ni-icon">🗺️</div><span>出海</span>
+        </div>
+        <div class="nav-item">
+          <div class="ni-icon">👤</div><span>我的</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ② 鉴定弹窗（叠在主界面上） -->
+    <div class="screen" id="s-appraisal">
+      <div style="position:relative;width:100%;height:100%;background:linear-gradient(180deg,#3D2B1F 0%,#2A1F14 100%);">
+        <!-- 模糊底图 -->
+        <div style="position:absolute;inset:0;filter:blur(4px);opacity:.4;">
+          <div class="scratch-area" style="height:100%;"></div>
+        </div>
+        <!-- 弹窗 -->
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;">
+          <div class="appraisal-card">
+            <div class="card-header">
+              <span class="card-title">🔍 鉴定结果</span>
+              <span class="rarity-badge rarity-rare">稀有</span>
+            </div>
+            <div class="card-reveal">
+              <div class="reveal-glow"></div>
+              <div class="reveal-particles"></div>
+              <div class="reveal-artifact"></div>
+            </div>
+            <div class="card-info">
+              <div class="artifact-name">商代饕餮纹青铜鼎</div>
+              <div class="artifact-dynasty">商代晚期 · 约公元前 1100 年</div>
+              <div class="info-row">
+                <span class="info-label">估值</span>
+                <span class="info-value gold-text">🪙 48,000</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">品相</span>
+                <span class="info-value condition-good">完好（轻微锈蚀）</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">清洁评分</span>
+                <span class="info-value">94% · 精良</span>
+              </div>
+              <div class="history-note">
+                饕餮纹是商代最具代表性的纹饰，象征权力与神权。此件铸造工艺精良，
+                口沿内侧有铭文痕迹，有待进一步研究。
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn-sell">
+                <span>卖给藏家</span>
+                <span class="btn-sub">🪙 +48,000</span>
+              </button>
+              <button class="btn-donate">
+                <span>捐献博物馆</span>
+                <span class="btn-sub">⭐ +120 声望</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ③ 工具升级（底部弹出） -->
+    <div class="screen" id="s-upgrade">
+      <div class="upgrade-overlay" style="flex:1;">
+        <!-- 底图 -->
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,#3D2B1F,#2A1F14);opacity:.8;"></div>
+        <!-- 底部弹出 -->
+        <div class="upgrade-sheet" style="position:relative;z-index:1;">
+          <div class="sheet-handle"></div>
+          <div class="sheet-title">工具升级</div>
+          <div class="sheet-subtitle">更好的工具，更高的清洁效率和品相评分</div>
+
+          <div class="tool-cards">
+            <div class="tool-card">
+              <div class="tc-icon">🖌️</div>
+              <div class="tc-name">软毛刷</div>
+              <div class="tc-effect">基础画刷<br>适合泥土清洁</div>
+              <div class="tc-price" style="color:var(--green);font-size:10px;">✓ 已拥有</div>
+            </div>
+            <div class="tool-card current">
+              <div class="current-badge">当前</div>
+              <div class="tc-icon">⚙️</div>
+              <div class="tc-name">抛光机</div>
+              <div class="tc-effect">画刷 ×1.8<br>去除顽固锈迹</div>
+              <div class="tc-price" style="color:var(--green);font-size:10px;">✓ 已拥有</div>
+            </div>
+            <div class="tool-card locked">
+              <div class="tc-icon">💧</div>
+              <div class="tc-name">高压水枪</div>
+              <div class="tc-effect">画刷 ×3.0<br>大面积快速清洁</div>
+              <div class="tc-price">🪙 30,000</div>
+            </div>
+          </div>
+
+          <div class="upgrade-desc">
+            <strong style="color:var(--dark);">高压水枪</strong> 可将画刷半径提升至 3 倍，
+            特别适合大面积藤壶和珊瑚清洁。升级后可解锁「水流粒子特效」，
+            提升清洁满足感。
+          </div>
+
+          <button class="btn-upgrade">
+            <span>🪙 30,000</span>
+            <span>升级至高压水枪</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ④ 博物馆 -->
+    <div class="screen" id="s-museum">
+      <div class="status-bar">
+        <span>9:41</span><span>陈记古玩铺</span><span>🔋</span>
+      </div>
+      <div class="museum-header">
+        <div class="museum-title">🏛️ 私人博物馆</div>
+        <div class="collection-progress">
+          <div class="coll-bar-bg"><div class="coll-bar-fill"></div></div>
+          <div class="coll-text">9 / 30</div>
+        </div>
+      </div>
+
+      <div class="museum-body">
+        <div class="museum-stats">
+          <div class="stat-item">
+            <div class="stat-val">🪙 3.2K</div>
+            <div class="stat-lbl">日均参观收入</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val">⭐ 680</div>
+            <div class="stat-lbl">累计声望</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val">9</div>
+            <div class="stat-lbl">已入馆</div>
+          </div>
+        </div>
+
+        <div class="period-label">商周青铜 · 1 / 5 已集</div>
+        <div class="artifact-grid">
+          <div class="artifact-cell revealed">
+            <div class="ac-inner">
+              <div class="ac-art bronze"></div>
+              <div class="ac-name">饕餮纹青铜鼎</div>
+            </div>
+            <div class="ac-rarity-dot dot-rare"></div>
+          </div>
+          <div class="artifact-cell locked">
+            <div class="ac-inner">
+              <div class="ac-lock">🔒</div>
+              <div class="ac-name" style="color:rgba(255,255,255,.2);">???</div>
+            </div>
+          </div>
+          <div class="artifact-cell locked">
+            <div class="ac-inner">
+              <div class="ac-lock">🔒</div>
+              <div class="ac-name" style="color:rgba(255,255,255,.2);">???</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="period-label">汉代陶瓷 · 3 / 5 已集</div>
+        <div class="artifact-grid">
+          <div class="artifact-cell revealed">
+            <div class="ac-inner">
+              <div class="ac-art ceramic"></div>
+              <div class="ac-name">青釉盘口壶</div>
+            </div>
+            <div class="ac-rarity-dot dot-normal"></div>
+          </div>
+          <div class="artifact-cell revealed">
+            <div class="ac-inner">
+              <div class="ac-art ceramic" style="border-radius:30% 30% 50% 50%;width:55%;"></div>
+              <div class="ac-name">长沙窑褐彩碗</div>
+            </div>
+            <div class="ac-rarity-dot dot-normal"></div>
+          </div>
+          <div class="artifact-cell revealed">
+            <div class="ac-inner">
+              <div class="ac-art jade"></div>
+              <div class="ac-name">玉璧·谷纹</div>
+            </div>
+            <div class="ac-rarity-dot dot-epic"></div>
+          </div>
+        </div>
+
+        <div class="period-label">宋元海捞 · 2 / 8 已集</div>
+        <div class="artifact-grid">
+          <div class="artifact-cell revealed">
+            <div class="ac-inner">
+              <div class="ac-art ceramic" style="background:radial-gradient(ellipse,#B8D4E8,#7A9AB8,#3A6080);border-radius:30%;width:55%;"></div>
+              <div class="ac-name">影青釉执壶</div>
+            </div>
+            <div class="ac-rarity-dot dot-rare"></div>
+          </div>
+          <div class="artifact-cell revealed">
+            <div class="ac-inner">
+              <div class="ac-art ceramic" style="background:radial-gradient(ellipse,#C8A870,#8B6040,#5A3820);border-radius:20%;width:55%;"></div>
+              <div class="ac-name">建窑黑釉盏</div>
+            </div>
+            <div class="ac-rarity-dot dot-normal"></div>
+          </div>
+          <div class="artifact-cell locked">
+            <div class="ac-inner">
+              <div class="ac-lock">🔒</div>
+              <div class="ac-name" style="color:rgba(255,255,255,.2);">???</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:16px;"></div>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item" onclick="showScreen('main')">
+          <div class="ni-icon">🏠</div><span>工作台</span>
+        </div>
+        <div class="nav-item active">
+          <div class="ni-icon">🏛️</div><span>博物馆</span>
+        </div>
+        <div class="nav-item">
+          <div class="ni-icon">🗺️</div><span>出海</span>
+        </div>
+        <div class="nav-item">
+          <div class="ni-icon">👤</div><span>我的</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /phone -->
+
+  <!-- ══ 注释 ══════════════════════════════════ -->
+  <div class="notes">
+    <h3>Phase 2 · UI/UX 设计说明</h3>
+
+    <h4>色彩系统</h4>
+    <ul>
+      <li>主色调：暖棕 <code>#6B3A2A</code>（古玩铺质感）</li>
+      <li>强调色：博物馆金 <code>#C9A84C</code></li>
+      <li>背景纸色：<code>#F2E8D9</code> / <code>#FFF8EE</code></li>
+      <li>稀有色：金 / 紫 / 绿（三级稀有度）</li>
+    </ul>
+
+    <h4>① 刮擦主界面</h4>
+    <ul>
+      <li><span class="tag tag-window">MainWindow</span> 主游戏界面</li>
+      <li>顶部：资源栏（金币 + 声望）</li>
+      <li>文物名片：当前文物信息 + 稀有度标签</li>
+      <li>中心：深色刮擦区，文物居中</li>
+      <li>底部：进度条 + 工具选择 + 底部导航</li>
+    </ul>
+
+    <hr class="note-sep">
+    <h4>② 鉴定弹窗</h4>
+    <ul>
+      <li><span class="tag tag-window">AppraisalWindow</span> blurBackground=true</li>
+      <li>进度达 90% 自动触发</li>
+      <li>文物"大展示"卡片，带粒子特效</li>
+      <li>估值 / 品相 / 清洁评分</li>
+      <li>历史简注（可选读）</li>
+      <li>卖出 / 捐献 两个行动按钮</li>
+      <li>国宝级：卖出按钮置灰，仅可捐献</li>
+    </ul>
+
+    <hr class="note-sep">
+    <h4>③ 工具升级</h4>
+    <ul>
+      <li><span class="tag tag-window">UpgradeWindow</span> 底部滑出</li>
+      <li>三张工具卡横排，当前高亮</li>
+      <li>未解锁工具置灰 + 显示费用</li>
+      <li>升级说明 + 一键升级按钮</li>
+    </ul>
+
+    <hr class="note-sep">
+    <h4>④ 博物馆</h4>
+    <ul>
+      <li><span class="tag tag-window">MuseumWindow</span></li>
+      <li>顶部：收藏进度条（n/30）</li>
+      <li>日均收入 / 声望 / 已入馆 三项统计</li>
+      <li>按历史时期分组，每组 3 列网格</li>
+      <li>已入馆：展示文物图 + 名称 + 稀有点</li>
+      <li>未集齐：锁图标 + "???" 黑色剪影</li>
+    </ul>
+
+    <hr class="note-sep">
+    <h4>待补充的美术资产</h4>
+    <ul>
+      <li>文物底图（脏 / 清洁两张，每件文物）</li>
+      <li>笔刷工具图标（三档）</li>
+      <li>金币 / 声望图标</li>
+      <li>博物馆背景纹理</li>
+      <li>稀有度边框贴图</li>
+      <li>NPC 立绘（Phase 3）</li>
+    </ul>
+  </div>
+
+</div><!-- /phone-wrap -->
+
+<script>
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  const map = { main: 0, appraisal: 1, upgrade: 2, museum: 3 };
+  document.querySelectorAll('.nav-btn')[map[id]].classList.add('active');
+}
+</script>
+</body>
+</html>

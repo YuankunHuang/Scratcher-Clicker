@@ -1,11 +1,12 @@
 import { _decorator, AudioSource, Component, Node, game, director } from 'cc';
-import {ServiceLocator, Tokens} from "./core/ServiceLocator";
-import {IAudioManager, IEventManager, ISaveManager, isDisposable, IUIManager} from "./core/interfaces";
-import {EventManagerImpl} from "./core/EventManagerImpl";
-import {SaveManagerImpl} from "./core/SaveManagerImpl";
-import {AudioManagerImpl} from "./core/AudioManagerImpl";
-import {UIManagerImpl, WindowLayers} from "./core/UIManagerImpl";
-import {AppFlow} from "./AppFlow";
+import { ServiceLocator, Tokens } from "./core/ServiceLocator";
+import { IAssetManager, IAudioManager, IEventManager, ISaveManager, isDisposable, IUIManager } from "./core/interfaces";
+import { EventManagerImpl } from "./core/EventManagerImpl";
+import { SaveManagerImpl } from "./core/SaveManagerImpl";
+import { AudioManagerImpl } from "./core/AudioManagerImpl";
+import { UIManagerImpl, WindowLayers } from "./core/UIManagerImpl";
+import { AssetManagerImpl } from "./core/AssetManagerImpl";
+import { AppFlow } from "./AppFlow";
 
 const { ccclass, property } = _decorator;
 
@@ -74,6 +75,8 @@ export class GameManager extends Component {
         };
 
         ServiceLocator.register<IUIManager>(Tokens.UI, new UIManagerImpl(layers));
+
+        ServiceLocator.register<IAssetManager>(Tokens.Asset, new AssetManagerImpl());
     }
     
     private _init(): void {

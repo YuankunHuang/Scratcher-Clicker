@@ -19,10 +19,13 @@ const { ccclass, property } = _decorator;
  * ScratchRenderer
  *
  * 触摸时直接在 CPU 侧 Uint8Array 写像素，uploadData 到 Texture2D 作为 scratchMaskTex。
- * 不依赖 Camera-to-RT 方案（Cocos 3.x UIStage 不会向 targetTexture 相机提交 2D drawcall）。
+ *
+ * 注意：dirtSprite 的 SpriteFrame 必须在编辑器中关闭 Packable，
+ * 否则 DynamicAtlasManager 会把贴图打进图集，导致 v_uv 不再是 [0,1]，
+ * scratchMaskTex 采样位置与 _paintBrush 写入位置错位，擦除效果消失。
  *
  * 场景依赖：
- *   - dirtSprite：挂有 ScratchMaterial 的脏污层 Sprite
+ *   - dirtSprite：挂有 ScratchMaterial 的脏污层 Sprite（与 scratchArea 同节点）
  *   - scratchArea：定义触摸有效区域的 UITransform
  */
 @ccclass('ScratchRenderer')
@@ -78,8 +81,8 @@ export class ScratchRenderer extends Component {
         this._touchTarget.on(Node.EventType.TOUCH_END,    this._onTouchEnd,    this);
         this._touchTarget.on(Node.EventType.TOUCH_CANCEL, this._onTouchCancel, this);
 
-        this.setActive(true); // 默认启用
-        this.onProgress?.(0); // 一开始就初始化一下进度
+        this.setActive(true);
+        this.onProgress?.(0);
     }
 
     onDisable() {
